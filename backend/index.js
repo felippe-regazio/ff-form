@@ -5,12 +5,14 @@ const storage = require('./storage.js');
 const frontEndPath = path.resolve(__dirname, '..', 'frontend', 'index.html');
 const PORT = 5000;
 
+// Mostra uma pagina 404 - Nao encontrada
 function is404(res) {
   res.writeHead(404);
   res.write('404 Not Found');
   res.end();
 }
 
+// Define cada rota da API
 const router = {
   get: {
     '/': (_req, res) => {
@@ -18,7 +20,7 @@ const router = {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
-      res.end(JSON.stringify(data));
+      res.end(data);
     }
   },
 
@@ -52,6 +54,7 @@ const router = {
   },
 };
 
+// Cria o servidor
 http.createServer((req, res) => {
   const reqUrl = new URL(req.url, 'http://127.0.0.1/');
   const method = req.method.toLowerCase();

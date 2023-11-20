@@ -4,8 +4,148 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Example</title>
+
+  <style>
+    html * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      color: #444;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      padding-top: 80px;
+    }
+
+    .container {
+      display: block;
+      max-width: 780px;
+      padding: 0 10px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    form > textarea,
+    form > select,
+    form > label,
+    form > button,
+    form > input {
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    form label {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    form > textarea {
+      width: 100%;
+      color: #444;
+      padding: 10px;
+      border-radius: 8px;
+      border: solid 1px #ccc;
+      min-height: 300px;
+    }
+
+    form button {
+      color: #fff;
+      border: solid 1px #33C3F0;
+      background-color: #33C3F0;
+      padding: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transform: 200ms;
+    }
+
+    form button:hover {
+      filter: brightness(1.2);
+      transition: 200ms;
+    }
+
+    form .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
 </head>
 <body>
-  <!-- Code goes here -->
+  <div class="container">
+
+    <!-- Aqui criamos um formulario que chama a função sendData sempre que enviado -->
+
+    <form onsubmit="sendData(event);">
+      <label for="postit">Reminders</label>
+      <textarea id="postit" name="reminders" oninput="autoSave()"></textarea>
+  
+      <div class="controls">
+        <button type="submit">
+          Save
+        </button>
+  
+        <label for="autosave">
+          <input type="checkbox" id="autosave" checked>
+          Autosave
+        </label>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Definimos o endereço comum da API, este é o endereço ao qual nosso backend roda em modo local
+    const API_ADDRESS = 'http://127.0.0.1:5000/';
+
+    // Esta é a função que chamamos ao modificar qualquer item
+    function autoSave() {
+      const check = document.getElementById('autosave');
+
+      if (check.checked) {
+        sendData();
+      }
+    }
+
+    // Esta é a função que quando chamada empacota os dados no form
+    // E envia para o nosso backend via POST
+    function sendData(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      const postit = document.getElementById('postit');
+      const body = JSON.stringify({ reminders: postit.value });
+      
+      fetch(API_ADDRESS, { method: 'post', body })
+        .catch(console.error);
+    }
+
+    // Esta é a função que quando chamada, pede para o backend os dados
+    // que foram salvos da ultima vez (Ou pode vir como vazio se não tiver nada)
+    function getData() {
+      fetch(API_ADDRESS, { method: 'get' })
+        .then(resp => resp.json())
+        .then(data => {
+          const postit = document.getElementById('postit');
+  
+          if (data) {
+            postit.value = data.reminders || "";
+          }
+        })
+        .catch(console.error);
+    }
+
+    // Chamamos a função getData assim que a pagina abre pra atualizar
+    // o conteudo ja de cara e não exibir uma pagina vazia
+    getData();
+  </script>
 </body>
 </html>
